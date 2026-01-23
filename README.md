@@ -114,3 +114,85 @@ This password is too short. It must contain at least 8 characters.
 This password is too common.
 Bypass password validation and create user anyway? [y/N]: y
 Superuser created successfully.
+
+-> Now, lets create django apps
+(myvenv).../specific_location/ITVerse > mkdir apps
+(myvenv).../specific_location/ITVerse > python manage.py startapp {users} apps/{users}
+
+    Config app's path
+    go to the app dir and open apps.py
+
+    from django.apps import AppConfig
+
+    class MasterConfig(AppConfig):
+        name = 'apps.{master}' # add apps.app-name
+
+    Now, config you app in project/settings.py
+
+    # Application definition
+
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'apps.master', # Add new
+        'apps.users', # Add new
+    ]
+
+    (Optional)
+
+    INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    ]
+
+    # CUSTOM_APPS
+    INSTALLED_APPS += [
+        'apps.master',
+        'apps.users'
+    ]
+
+    # THIRDPARTY_APPS
+    INSTALLED_APPS += [
+        
+    ]
+
+
+-> Create tamplate directory in dashboard app
+
+(myvenv).../specific_location/ITVerse/apps/dashboard > 
+    dashboard/
+        - templates/ - create dir
+            - dashboard/ - create dir
+                - index.html
+                - about.html
+                - contact.html
+
+-> Setup media and static files : project/settings.py
+
+    import os
+
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+    &
+
+    Add project/settings.py/url.py
+
+    from django.conf import settings # Add new
+    from django.conf.urls.static import static # Add new
+
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Add new
+
