@@ -197,3 +197,26 @@ Superuser created successfully.
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Add new
 
 ---------------------------------------------------------------------------------
+
+Model fields types:
+https://docs.djangoproject.com/en/6.0/ref/models/fields/
+
+
+Create Django model:
+
+from django.db import models
+
+class TableName(models.Model):
+
+    field_1 = models.FieldType(fireld configurations....)
+    field_2 = models.FieldType(fireld configurations....)
+
+-> create migrations script
+(myvenv).../specific_location/ITVerse > python manage.py makemigrations
+(myvenv) C:\BITBRIJESHSIR\projects\ITVerse>python manage.py makemigrations
+Migrations for 'users':
+  apps\users\migrations\0001_initial.py
+    + Create model User
+
+-> Migrate your script int database
+(myvenv).../specific_location/ITVerse > python manage.py migrate
