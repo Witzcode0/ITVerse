@@ -220,3 +220,12 @@ Migrations for 'users':
 
 -> Migrate your script int database
 (myvenv).../specific_location/ITVerse > python manage.py migrate
+
+-----------------------------------------------
+Form preparation
+
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="email" name="email">
+     <button type="submit">click me</button>
+</form>

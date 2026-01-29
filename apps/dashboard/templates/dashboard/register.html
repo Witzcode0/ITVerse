@@ -14,87 +14,87 @@ Register
       Create a new Account
     </h2>
 
-    <div class="relative mb-4">
-      <label for="user_type" class="leading-7 text-sm text-gray-600">
-        User type
-      </label>
-      <select type="user_type" id="user_type" name="user_type" class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out">
-        <option value="" disabled selected>Choose user type</option> 
-        <option value="buyer">Buyer</option> 
-        <option value="seller">Seller</option>
-      </select>
-       
-    </div>
-    <div class="relative mb-4">
-      <label for="email" class="leading-7 text-sm text-gray-600">
-        Email
-      </label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
-        placeholder="example@gmail.com"
+    <form action="{% url 'register' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="relative mb-4">
+        <label for="user_type" class="leading-7 text-sm text-gray-600">
+          User type
+        </label>
+        <select type="user_type" id="user_type" name="user_type" class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out">
+          <option value="" disabled selected>Choose user type</option> 
+          <option value="buyer">Buyer</option> 
+          <option value="seller">Seller</option>
+        </select>
+         
+      </div>
+      <div class="relative mb-4">
+        <label for="email" class="leading-7 text-sm text-gray-600">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+          placeholder="example@gmail.com"
+        >
+      </div>
+      <div class="relative mb-4">
+        <label for="mobile" class="leading-7 text-sm text-gray-600">
+          Mobile
+        </label>
+        <input
+          type="text"
+          id="mobile"
+          name="mobile"
+          class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+          placeholder="+XXX1234567890"
+        >
+      </div>
+      <div class="relative mb-4">
+        <label for="pancard" class="leading-7 text-sm text-gray-600">
+          Attach Pancard
+        </label>
+        <input
+          type="file"
+          id="pancard"
+          name="pancard"
+          class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+        >
+      </div>
+      <div class="relative mb-4">
+        <label for="password" class="leading-7 text-sm text-gray-600">
+          Password
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+          placeholder="********"
+        >
+      </div>
+      <div class="relative mb-4">
+        <label for="confirm_password" class="leading-7 text-sm text-gray-600">
+          Confirm password
+        </label>
+        <input
+          type="password"
+          id="confirm_password"
+          name="confirm_password"
+          class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+          placeholder="********"
+        >
+      </div>
+      <button type="submit"
+        class="w-full text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded text-lg"
       >
-    </div>
+        Register
+      </button>
+    </form>
 
-    <div class="relative mb-4">
-      <label for="mobile" class="leading-7 text-sm text-gray-600">
-        Mobile
-      </label>
-      <input
-        type="text"
-        id="mobile"
-        name="mobile"
-        class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
-        placeholder="+91 XXXXXXXXXX"
-      >
-    </div>
-
-    <div class="relative mb-4">
-      <label for="pancard" class="leading-7 text-sm text-gray-600">
-        Attach Pancard
-      </label>
-      <input
-        type="file"
-        id="pancard"
-        name="pancard"
-        class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
-      >
-    </div>
-
-    <div class="relative mb-4">
-      <label for="password" class="leading-7 text-sm text-gray-600">
-        Password
-      </label>
-      <input
-        type="password"
-        id="password"
-        name="password"
-        class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
-        placeholder="********"
-      >
-    </div>
-
-    <div class="relative mb-4">
-      <label for="confirm_password" class="leading-7 text-sm text-gray-600">
-        Confirm password
-      </label>
-      <input
-        type="password"
-        id="confirm_password"
-        name="confirm_password"
-        class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
-        placeholder="********"
-      >
-    </div>
-
-    <button
-      class="w-full text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded text-lg"
-    >
-      Register
-    </button>
-
+    
     <!-- LOGIN LINK -->
     <div class="text-center mt-4 text-sm">
       <span class="text-gray-600">Already have an account?</span>

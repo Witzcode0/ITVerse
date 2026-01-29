@@ -6,11 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}
-        {% endblock %} | 
+        {% endblock %} |
         ITVERSE
     </title>
     <!-- Include the Play CDN script -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+    </style>
 </head>
 
 <body>
@@ -41,12 +58,42 @@
         </div>
     </header>
     <!-- Navbar -->
+    {% if messages %}
+    <div class="fixed top-5 right-5 z-50 space-y-3">
+        {% for message in messages %}
+        <div class="
+        flex items-center gap-3
+        px-4 py-3 rounded-lg shadow-lg
+        animate-slide-in
+        {% if message.tags == 'success' %}
+            bg-green-500 text-white
+        {% elif message.tags == 'error' %}
+            bg-red-500 text-white
+        {% elif message.tags == 'warning' %}
+            bg-yellow-500 text-black
+        {% elif message.tags == 'info' %}
+            bg-blue-500 text-white
+        {% else %}
+            bg-gray-700 text-white
+        {% endif %}
+        ">
+            <span class="flex-1">{{ message }}</span>
+
+            <!-- Close Button -->
+            <button onclick="this.parentElement.remove()" class="text-xl leading-none font-bold">
+                &times;
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <hr>
     <!-- Main -->
-     <div class="container px-5 py-24 mx-auto">
+    <div class="container px-5 py-24 mx-auto">
         {% block body %}
-        {% endblock %} 
-     </div>
+        {% endblock %}
+    </div>
     <!-- Main -->
     <!-- Footer -->
     <footer class="text-gray-600 body-font">
@@ -123,7 +170,8 @@
         </div>
         <div class="bg-gray-100">
             <div class="container px-5 py-6 mx-auto flex items-center sm:flex-row flex-col">
-                <a href="{% url 'index' %}" class="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
+                <a href="{% url 'index' %}"
+                    class="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
                         stroke-linejoin="round" stroke-width="2"
                         class="w-10 h-10 text-white p-2 bg-blue-500 rounded-full" viewBox="0 0 24 24">
@@ -171,6 +219,12 @@
         </div>
     </footer>
     <!-- Footer -->
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('[class*="animate-slide-in"]')
+                .forEach(el => el.remove());
+        }, 10000);
+    </script>
 </body>
 
 </html>
