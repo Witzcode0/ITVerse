@@ -12,8 +12,8 @@ def pancard_upload_path(instance, filename):
 
 class User(BaseClass):
     USER_TYPE_CHOICES = (
-        ("Buyer", "buyer"),
-        ("Seller", "seller"),
+        ("buyer", "Buyer"),
+        ("seller", "Seller"),
     )
     user_type = models.CharField(max_length=50, null=False, blank=False, choices=USER_TYPE_CHOICES)
     email = models.EmailField(max_length=100, null=False, blank=False, unique=True)

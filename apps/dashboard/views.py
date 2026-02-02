@@ -1,9 +1,38 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.contrib.auth.hashers import make_password, check_password
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from apps.users.models import User
 from apps.master.utils.inputValidator import *
 # Create your views here.
 def login(request):
+    if request.method == 'POST':
+        email_ = request.POST['email']
+        password_ = request.POST['password']
+
+        if not is_valid_email(email_):
+            messages.error(request, "Invalid email")
+            return redirect("login")
+        
+        if not User.objects.filter(email=email_).exists():
+            messages.error(request, "Email or Password dose not match")
+            return redirect("login")
+        
+        get_user = User.objects.get(email=email_)
+        user_password = check_password(password_, get_user.password)
+
+        if not (user_password):
+            messages.error(request, "Email or Password dose not match")
+            return redirect("login")
+        
+        if not get_user.is_active:
+            messages.error(request, "Your account is currently inactive. Please contact the administrator for activation.")
+            return redirect("login")
+        
+        return redirect("index")
+        
     return render(request, "dashboard/login.html")
 
 def register(request):
@@ -31,7 +60,6 @@ def register(request):
             messages.error(request, "Mobile already exist")
             return redirect("register")
 
-        print("1", match_password(password_, confirm_password_))
         if not match_password(password_, confirm_password_)[0]:
             messages.error(request, f"{match_password(password_, confirm_password_)[1]}")
             return redirect("register")
@@ -48,18 +76,88 @@ def register(request):
             email=email_,
             mobile=mobile_,
             pancard=pancard_,
-            password=password_
+            password=make_password(password_)
         )
         new_user.save()
+        messages.success(
+            request,
+            "Registration successful! Your application is under review. We will notify you once it is approved."
+        )
         return redirect("login")
 
     return render(request, "dashboard/register.html")
 
 def forgot_password(request):
+    if request.method == "POST":
+        email_ = request.POST['email']
+
+        if not is_valid_email(email_):
+            messages.error(request, "Invalid email")
+            return redirect("forgot_password")
+        
+        if not User.objects.filter(email=email_).exists():
+            messages.error(request, "Email does not exist.")
+            return redirect("forgot_password")
+        
+        get_user = User.objects.get(email=email_)
+        
+        domain = get_current_site(request).domain
+        reset_link = f"http://{domain}/reset-password/{get_user.id}/"
+        
+        subject = "Reset Your Password - ITVERSE"
+        message = f"""
+        Hello User,
+
+        We received a request to reset your password for your ITVERSE account.
+
+        Click the link below to reset your password:
+        {reset_link}
+
+        If you did not request this, please ignore this email.
+
+        ⚠️ This link will expire soon for security reasons.
+
+        Regards,  
+        ITVERSE Team
+        """
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [f"{email_}"]
+        send_mail(subject, message, from_email, recipient_list)
+        
+        get_user = User.objects.get(email=email_)
+
+
+
     return render(request, "dashboard/forgot_password.html")
 
-def reset_password(request):
-    return render(request, "dashboard/reset_password.html")
+def reset_password(request, user_id):
+    context = {
+        "user_id":user_id
+    }
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "Invalid reset link.")
+        return redirect("login")
+    else:
+        if request.method == "POST":
+            new_password_ = request.POST["new_password"]
+            confirm_password_ = request.POST["confirm_password"]
+          
+            if not match_password(new_password_, confirm_password_)[0]:
+                messages.error(request, f"{match_password(new_password_, confirm_password_)[1]}")
+                return render(request, "dashboard/reset_password.html", context)
+            
+            if not validate_password(new_password_)[0]:
+                messages.error(request, f"{validate_password(new_password_)[1]}")
+                return render(request, "dashboard/reset_password.html", context)
+        
+            user.password = make_password(new_password_)
+            user.save()
+            messages.success(request, "Password reset successfully.")
+            return redirect("login")
+    
+    return render(request, "dashboard/reset_password.html", context)
 
 def index(request):
     return render(request, "dashboard/index.html")
