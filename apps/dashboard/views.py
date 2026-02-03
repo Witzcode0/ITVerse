@@ -7,6 +7,20 @@ from django.contrib.sites.shortcuts import get_current_site
 from apps.users.models import User
 from apps.master.utils.inputValidator import *
 # Create your views here.
+
+def login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+
+        user_id = request.session.get("user_id")
+
+        if not user_id:
+            messages.error(request, "Please login first.")
+            return redirect("login")
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
 def login(request):
     if request.method == 'POST':
         email_ = request.POST['email']
@@ -31,6 +45,7 @@ def login(request):
             messages.error(request, "Your account is currently inactive. Please contact the administrator for activation.")
             return redirect("login")
         
+        request.session["user_id"] = str(get_user.id)
         return redirect("index")
         
     return render(request, "dashboard/login.html")
@@ -158,6 +173,43 @@ def reset_password(request, user_id):
             return redirect("login")
     
     return render(request, "dashboard/reset_password.html", context)
+
+@login_required
+def profile(request):
+    user_id_ = request.session["user_id"]
+    get_user = User.objects.get(id=user_id_)
+    context = {
+        "user": get_user
+    }
+    return render(request, "dashboard/profile.html", context)
+
+@login_required
+def update_profile(request):
+     if request.method == "POST":
+
+        user_id_ = request.session["user_id"]
+        get_user = User.objects.get(id=user_id_)
+
+        email_ = request.POST.get("email")
+        mobile_ = request.POST.get("mobile")
+        profile_ = request.FILES.get("profile")  # SAFE
+
+        # update fields
+        get_user.email = email_
+        get_user.mobile = mobile_
+
+        # only update image if new uploaded
+        if profile_:
+            get_user.profile = profile_
+
+        get_user.save()
+
+        messages.success(request, "Profile updated successfully.")
+        return redirect("profile")
+def logout(request):
+    del request.session["user_id"]
+    messages.success(request, "Now, you are logged Out.")
+    return redirect("login")
 
 def index(request):
     return render(request, "dashboard/index.html")
