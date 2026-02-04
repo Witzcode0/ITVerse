@@ -27,7 +27,7 @@ Profile
                 <!-- User Info -->
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">
-                        {{user.id}}
+                        {{user.fullname|title}}
                     </h2>
 
                     <p class="text-gray-500">
@@ -55,91 +55,88 @@ Profile
                 </button>
 
                 <!-- Modal Background -->
-<div id="profileModal"
-     class="fixed inset-0 bg-black/60 hidden 
+                <div id="profileModal" class="fixed inset-0 bg-black/60 hidden 
      items-center justify-center z-50 p-4">
 
-    <!-- Modal Box -->
-    <div class="bg-white w-full max-w-lg sm:max-w-xl lg:max-w-2xl
+                    <!-- Modal Box -->
+                    <div class="bg-white w-full max-w-lg sm:max-w-xl lg:max-w-2xl
                 max-h-[90vh] rounded-2xl shadow-xl 
                 flex flex-col">
 
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b p-4 sm:p-5">
-            <h2 class="text-lg sm:text-xl font-bold">Edit Profile</h2>
+                        <!-- Header -->
+                        <div class="flex justify-between items-center border-b p-4 sm:p-5">
+                            <h2 class="text-lg sm:text-xl font-bold">Edit Profile</h2>
 
-            <button onclick="closeModal()"
-                class="text-gray-500 hover:text-gray-800 text-2xl leading-none">
-                ✕
-            </button>
-        </div>
+                            <button onclick="closeModal()"
+                                class="text-gray-500 hover:text-gray-800 text-2xl leading-none">
+                                ✕
+                            </button>
+                        </div>
 
-        <!-- Scrollable Body -->
-        <div class="overflow-y-auto p-4 sm:p-6 flex-1">
+                        <!-- Scrollable Body -->
+                        <div class="overflow-y-auto p-4 sm:p-6 flex-1">
 
-            <form action="{% url 'update_profile' %}" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+                            <form action="{% url 'update_profile' %}" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
 
-                <!-- OLD IMAGE PREVIEW -->
-                <div class="flex flex-col items-center mb-6">
+                                <!-- OLD IMAGE PREVIEW -->
+                                <div class="flex flex-col items-center mb-6">
 
-                    <img src="{{ user.profile.url }}"
-                         class="w-24 h-24 sm:w-28 sm:h-28 rounded-full 
+                                    <img src="{{ user.profile.url }}" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full 
                                 object-cover border-4 border-gray-200 shadow">
 
-                    <p class="text-sm text-gray-500 mt-2">
-                        Current Profile Image
-                    </p>
-                </div>
+                                    <p class="text-sm text-gray-500 mt-2">
+                                        Current Profile Image
+                                    </p>
+                                </div>
 
-                <!-- FORM GRID -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- FORM GRID -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                    <!-- Upload -->
-                    <div class="sm:col-span-2">
-                        <label class="text-sm text-gray-600">Change Profile Image</label>
-                        <input type="file"
-                               name="profile"
-                               class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
+                                    <!-- Upload -->
+                                    <div class="sm:col-span-2">
+                                        <label class="text-sm text-gray-600">Change Profile Image</label>
+                                        <input type="file" name="profile" class="w-full mt-1 p-2 border rounded-lg">
+                                    </div>
 
-                    <!-- Email -->
-                    <div class="sm:col-span-2">
-                        <label class="text-sm text-gray-600">Email</label>
-                        <input type="email"
-                               name="email"
-                               value="{{user.email}}"
-                               class="w-full mt-1 p-2.5 border rounded-lg
+                                    <!-- Fullname -->
+                                    <div class="sm:col-span-2">
+                                        <label class="text-sm text-gray-600">Fullname</label>
+                                        <input type="text" name="fullname" value="{{user.fullname|title}}" class="w-full mt-1 p-2.5 border rounded-lg
                                focus:ring-2 focus:ring-blue-400 outline-none">
-                    </div>
+                                    </div>
 
-                    <!-- Mobile -->
-                    <div class="sm:col-span-2">
-                        <label class="text-sm text-gray-600">Mobile</label>
-                        <input type="text"
-                               name="mobile"
-                               value="{{user.mobile}}"
-                               class="w-full mt-1 p-2.5 border rounded-lg
+                                    <!-- Email -->
+                                    <div class="sm:col-span-2">
+                                        <label class="text-sm text-gray-600">Email</label>
+                                        <input type="email" name="email" value="{{user.email}}" class="w-full mt-1 p-2.5 border rounded-lg
                                focus:ring-2 focus:ring-blue-400 outline-none">
-                    </div>
+                                    </div>
 
-                    
 
-                </div>
+                                    <!-- Mobile -->
+                                    <div class="sm:col-span-2">
+                                        <label class="text-sm text-gray-600">Mobile</label>
+                                        <input type="text" name="mobile" value="{{user.mobile}}" class="w-full mt-1 p-2.5 border rounded-lg
+                               focus:ring-2 focus:ring-blue-400 outline-none">
+                                    </div>
 
-                <!-- Submit -->
-                <button type="submit"
-                    class="mt-6 w-full bg-blue-600 hover:bg-blue-700 
+
+
+                                </div>
+
+                                <!-- Submit -->
+                                <button type="submit" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 
                            text-white py-2.5 rounded-lg font-semibold
                            transition duration-200">
-                    Update Profile
-                </button>
+                                    Update Profile
+                                </button>
 
-            </form>
+                            </form>
 
-        </div>
-    </div>
-</div>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
@@ -193,20 +190,20 @@ Profile
     </div>
 </div>
 <script>
-function openModal(){
-    const modal = document.getElementById('profileModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    function openModal() {
+        const modal = document.getElementById('profileModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
 
-    document.body.style.overflow = 'hidden';
-}
+        document.body.style.overflow = 'hidden';
+    }
 
-function closeModal(){
-    const modal = document.getElementById('profileModal');
-    modal.classList.add('hidden');
+    function closeModal() {
+        const modal = document.getElementById('profileModal');
+        modal.classList.add('hidden');
 
-    document.body.style.overflow = 'auto';
-}
+        document.body.style.overflow = 'auto';
+    }
 </script>
 
 {% endblock %}

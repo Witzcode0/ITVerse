@@ -190,11 +190,13 @@ def update_profile(request):
         user_id_ = request.session["user_id"]
         get_user = User.objects.get(id=user_id_)
 
+        fullname_ = request.POST.get("fullname")
         email_ = request.POST.get("email")
         mobile_ = request.POST.get("mobile")
         profile_ = request.FILES.get("profile")  # SAFE
 
         # update fields
+        get_user.fullname = fullname_
         get_user.email = email_
         get_user.mobile = mobile_
 
