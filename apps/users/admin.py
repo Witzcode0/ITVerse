@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.users.models import User, Services, companyProfile, socialLinks
+from apps.users.models import User, Service, Company, socialLinks
 # Register your models here.
 
 
@@ -8,6 +8,6 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 
-admin.site.register(Services)
-admin.site.register(companyProfile)
+admin.site.register(Service)
+admin.site.register(Company)
 admin.site.register(socialLinks)

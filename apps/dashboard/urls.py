@@ -9,6 +9,7 @@ urlpatterns = [
     path('reset-password/<uuid:user_id>/', reset_password, name='reset_password'),
     path('profile/', profile, name='profile'),
     path('update_profile/', update_profile, name='update_profile'),
+    path("add-company", add_company, name="add_company"),
     path('logout/', logout, name='logout'),
     path('blog/', blog, name='blog'),
     path('about/', about, name='about'),

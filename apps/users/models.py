@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from apps.master.models import BaseClass
 import os
+import uuid
 
 # Create your models here.
 
@@ -81,17 +82,34 @@ class User(BaseClass):
             self.profile.name = new_filename
             super().save(update_fields=['profile'])
 
-class Services(BaseClass):
-    name = models.CharField(max_length=255, blank=False, null=False, unique=True)
+class Service(BaseClass):
+
+    name = models.CharField(max_length=150, unique=True)
+
+    # Which company suggested this service
+    created_by_company = models.ForeignKey(
+        "Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_services"
+    )
+
+    # Admin approval
+    is_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
 
 def company_logo_upload_path(instance, filename):
     ext = filename.split('.')[-1]
-    filename = f"company_{instance.id}.{ext}"
-    return os.path.join("company-logos", filename)
 
-class companyProfile(BaseClass):
+    # temporary unique name (first upload)
+    return f"company-logos/temp_{uuid.uuid4()}.{ext}"
+
+class Company(BaseClass):
+
     contact_person = models.ForeignKey(User, on_delete=models.CASCADE)
-    services = models.ForeignKey(Services, on_delete=models.CASCADE)
 
     logo = models.ImageField(
         upload_to=company_logo_upload_path,
@@ -101,42 +119,60 @@ class companyProfile(BaseClass):
     name = models.CharField(max_length=255)
     content = models.TextField()
     address = models.CharField(max_length=255)
-    
+
+    services = models.ManyToManyField(
+        Service,
+        related_name="companies",
+        blank=True
+    )
+
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
 
-        # Get old logo before saving
-        try:
-            old_logo = companyProfile.objects.get(pk=self.pk).logo
-        except companyProfile.DoesNotExist:
-            old_logo = None
+        # Track old logo
+        old_logo = None
+        if self.pk:
+            try:
+                old_logo = Company.objects.get(pk=self.pk).logo
+            except Company.DoesNotExist:
+                pass
 
-        super().save(*args, **kwargs)  # Save first to get ID
+        super().save(*args, **kwargs)  
+        # Now instance has ID
 
-        # Rename file AFTER ID exists
-        if self.logo and not self.logo.name.startswith(f"company-logos/company_{self.id}"):
+        # 🔥 Skip if default image
+        if not self.logo or "default/company.png" in self.logo.name:
+            return
 
-            ext = self.logo.name.split('.')[-1]
-            new_name = f"company-logos/company_{self.id}.{ext}"
-            new_path = os.path.join(settings.MEDIA_ROOT, new_name)
+        ext = self.logo.name.split('.')[-1]
+        new_name = f"company-logos/company_{self.id}.{ext}"
+        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
 
-            # Delete if file already exists
-            if os.path.exists(new_path):
-                os.remove(new_path)
+        # If already renamed → skip
+        if self.logo.name == new_name:
+            return
 
+        # Delete existing file with same name
+        if os.path.exists(new_path):
+            os.remove(new_path)
+
+        # Rename temp file
+        if os.path.exists(self.logo.path):
             os.rename(self.logo.path, new_path)
 
-            self.logo.name = new_name
-            super().save(update_fields=['logo'])
+        self.logo.name = new_name
+        super().save(update_fields=["logo"])
 
-        # Delete old logo
-        if old_logo and old_logo.name != self.logo.name:
-            if old_logo.name != "default/company.png":
-                old_path = os.path.join(settings.MEDIA_ROOT, old_logo.name)
-                if os.path.exists(old_path):
-                    os.remove(old_path)
+        # Delete old logo (not default)
+        if old_logo and old_logo.name != "default/company.png":
+            old_path = os.path.join(settings.MEDIA_ROOT, old_logo.name)
+            if os.path.exists(old_path):
+                os.remove(old_path)
     
 class socialLinks(BaseClass):
-    company = models.ForeignKey(companyProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=False, null=False)
     url = models.URLField()
     

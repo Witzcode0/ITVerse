@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from apps.users.models import User
+from apps.users.models import User, Company, socialLinks, Service
 from apps.master.utils.inputValidator import *
 # Create your views here.
 
@@ -178,9 +178,24 @@ def reset_password(request, user_id):
 def profile(request):
     user_id_ = request.session["user_id"]
     get_user = User.objects.get(id=user_id_)
+    # Get company (if exists)
+    company = Company.objects.filter(contact_person=user_id_).first()
+
+    # All services for dropdown
+    services = Service.objects.filter(is_approved=True, created_by_company=company)
+    print(company.services.filter(is_approved=True))
+
+    # print(services)
+    # Social links
+    social_links = socialLinks.objects.filter(user=user_id_)
+
     context = {
-        "user": get_user
+        "user": get_user,
+        "company": company,
+        "services": services,
+        "social_links": social_links,
     }
+
     return render(request, "dashboard/profile.html", context)
 
 @login_required
@@ -212,6 +227,89 @@ def logout(request):
     del request.session["user_id"]
     messages.success(request, "Now, you are logged Out.")
     return redirect("login")
+
+@login_required
+def add_company(request):
+    user = request.session["user_id"]
+    get_user = User.objects.get(id=user)
+    company, created = Company.objects.get_or_create(
+        contact_person=get_user
+    )
+
+    if request.method == "POST":
+
+        company.name = request.POST.get("name", "").strip()
+        company.address = request.POST.get("address", "").strip()
+        company.content = request.POST.get("content", "").strip()
+
+        if request.FILES.get("logo"):
+            company.logo = request.FILES["logo"]
+
+        company.save()
+
+        """
+        ✅ SERVICES (Handles both existing + new automatically)
+        """
+
+        service_names = request.POST.getlist("services[]")
+
+        service_objects = []
+
+        for name in service_names:
+
+            name = name.strip().title()
+
+            if not name:
+                continue
+
+            service, created = Service.objects.get_or_create(
+                name=name,
+                defaults={
+                    "created_by_company": company,
+                    "is_approved": False
+                }
+            )
+
+            service_objects.append(service)
+
+        # Replace old services safely
+        company.services.set(service_objects)
+
+        messages.success(request, "Company profile updated successfully 🚀")
+
+        return redirect("profile")
+
+    # ✅ Only approved services for suggestions
+    services = Service.objects.filter(is_approved=True).order_by("name")
+
+    context = {
+        "user":get_user,
+        "company": company,
+        "services": services,
+        "company_services": company.services.all()  # preselected chips
+    }
+
+    return render(request, "dashboard/profile.html", context)
+
+@login_required
+def add_social_link(request):
+    user_id_ = request.session["user_id"]
+    if request.method == "POST":
+
+        name = request.POST.get("name")
+        url = request.POST.get("url")
+
+        socialLinks.objects.create(
+            user=user_id_,
+            name=name,
+            url=url
+        )
+
+        messages.success(request, "Social link added ✅")
+
+        return redirect("profile")
+
+    return redirect("profile")
 
 def index(request):
     return render(request, "dashboard/index.html")

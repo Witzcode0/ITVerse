@@ -4,6 +4,33 @@
 Profile
 {% endblock %}
 
+{% block style %}
+<style>
+    .ts-control {
+        border-radius: 0.75rem;
+        border: 1px solid #d1d5db;
+        padding: 10px;
+    }
+
+    .ts-control.focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, .15);
+    }
+
+    .ts-control .item {
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 6px;
+        padding: 3px 8px;
+    }
+
+    .ts-dropdown {
+        border-radius: 12px;
+    }
+</style>
+
+{% endblock %}
+
 {% block body %}
 
 <div class="min-h-screen bg-gray-100 py-10">
@@ -178,18 +205,216 @@ Profile
                     {% endif %}
                 </div>
 
-                <a href="{% url 'logout' %}"
-                    class="w-28 h-10 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white">
-
-                    <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Logout
-                </a>
-
             </div>
+            <div class="border-t my-6"></div>
+
+            <!-- Tabs -->
+            <div class="border-b mb-6">
+                <div class="flex gap-6">
+
+
+                    <button onclick="openTab('company')" class="tab-btn text-blue-600 border-b-2 border-blue-600 pb-2">
+                        Company detail
+                    </button>
+
+                    <button onclick="openTab('social')" class="tab-btn text-gray-500 hover:text-blue-600 pb-2">
+                        Social Links
+                    </button>
+
+                </div>
+            </div>
+            <div id="company" class="tab-content">
+
+                <div class="bg-gray-100 p-6 rounded-2xl">
+
+                    <form action="{% url 'add_company' %}" method="POST" enctype="multipart/form-data"
+                        class="max-w-4xl mx-auto bg-white p-10 rounded-3xl shadow-xl space-y-8">
+
+                        {% csrf_token %}
+
+                        <!-- Title -->
+                        <div class="border-b pb-4">
+                            <h2 class="text-3xl font-bold text-gray-800">
+                                Company Details
+                            </h2>
+                            <p class="text-gray-500 text-sm mt-1">
+                                Keep your company information updated for better visibility.
+                            </p>
+                        </div>
+
+                        <!-- Logo Upload -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                Company Logo
+                            </label>
+
+                            <div class="flex items-center gap-6">
+
+                                <!-- Preview -->
+                                <div class="relative">
+                                    <img id="logoPreview"
+                                        src="{% if company and company.logo %}{{ company.logo.url }}{% else %}/media/default/company.png{% endif %}"
+                                        class="w-24 h-24 rounded-2xl object-cover border-2 border-gray-200 shadow-sm">
+                                </div>
+
+                                <!-- Upload Button -->
+                                <label
+                                    class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl shadow transition">
+                                    Change Logo
+                                    <input type="file" name="logo" accept="image/*" onchange="previewLogo(event)"
+                                        class="hidden">
+                                </label>
+
+                                <span class="text-sm text-gray-400">
+                                    PNG or JPG recommended
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <!-- Grid -->
+                        <div class="grid md:grid-cols-2 gap-6">
+
+                            <!-- Company Name -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                    Company Name
+                                </label>
+
+                                <input type="text" name="name" value="{{ company.name|default:'' }}"
+                                    placeholder="Enter company name" class="w-full border-none border-gray-300 rounded-xl p-3
+                                  focus:ring-2 focus:ring-blue-500
+                                  focus:border-blue-500
+                                  outline-none transition">
+                            </div>
+
+                            <!-- Address -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                    Address
+                                </label>
+
+                                <input type="text" name="address" value="{{ company.address|default:'' }}"
+                                    placeholder="Enter company address" class="w-full border-none border-gray-300 rounded-xl p-3
+                                  focus:ring-2 focus:ring-blue-500
+                                  focus:border-blue-500
+                                  outline-none transition">
+                            </div>
+
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Company Description
+                            </label>
+
+                            <textarea name="content" rows="5" placeholder="Tell users about your company..." class="w-full border-none  rounded-xl p-3
+                                 focus:ring-2 focus:ring-blue-500
+                                 focus:border-blue-500
+                                 outline-none transition">{{ company.content|default:'' }}</textarea>
+                        </div>
+
+                        <!-- Services -->
+                        <div>
+                            <div x-data="serviceSelect()" class="w-full">
+
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Services
+                                </label>
+
+                                <!-- Chips Container -->
+                                <div
+                                    class="flex flex-wrap items-center gap-2 border-none rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500">
+
+                                    <!-- Selected Chips -->
+                                    <template x-for="(service, index) in selected" :key="service">
+                                        <span
+                                            class="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm">
+                                            <span x-text="service"></span>
+
+                                            <button type="button" @click="remove(index)"
+                                                class="text-blue-500 hover:text-red-500 font-bold">
+                                                ✕
+                                            </button>
+
+                                            <!-- Hidden input for Django -->
+                                            <input type="hidden" name="services[]" :value="service">
+                                        </span>
+                                    </template>
+
+                                    <!-- Input -->
+                                    <input type="text" x-model="search" @input="filter()"
+                                        @keydown.enter.prevent="createService()" placeholder="Type and press enter..."
+                                        class="flex-1 outline-none p-1 min-w-[120px]">
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div x-show="filtered.length" @click.away="filtered=[]"
+                                    class="bg-white border rounded-xl mt-2 shadow-lg max-h-60 overflow-y-auto">
+
+                                    <template x-for="service in filtered" :key="service">
+                                        <div @click="add(service)" class="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                                            <span x-text="service"></span>
+                                        </div>
+                                    </template>
+                                </div>
+
+                            </div>
+
+
+                            <p class="text-xs text-gray-400 mt-2">
+                                Start typing to search or create new services.
+                            </p>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700
+                               text-white py-3 rounded-2xl
+                               font-semibold text-lg
+                               shadow-md hover:shadow-lg
+                               transition duration-200">
+
+                                Save Company
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+            <div id="social" class="tab-content hidden">
+                <div class="bg-gray-50 p-6 rounded-xl">
+
+                    {% for link in social_links %}
+                    <a href="{{ link.url }}" class="block text-blue-600 mb-2">
+                        {{ link.name }}
+                    </a>
+                    {% empty %}
+                    No links added.
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <a href="{% url 'logout' %}"
+                class="w-28 h-10 flex items-center my-6 justify-center bg-red-500 hover:bg-red-600 text-white">
+
+                <i class="fa-solid fa-right-from-bracket"></i> &nbsp; Logout
+            </a>
+
+
 
         </div>
     </div>
 </div>
 <script>
+    function previewLogo(event) {
+        const image = document.getElementById('logoPreview');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    }
     function openModal() {
         const modal = document.getElementById('profileModal');
         modal.classList.remove('hidden');
@@ -204,6 +429,84 @@ Profile
 
         document.body.style.overflow = 'auto';
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        openTab('company');
+    });
+
+    function openTab(tabId) {
+
+        document.querySelectorAll('.tab-content')
+            .forEach(tab => tab.classList.add('hidden'));
+
+        document.querySelectorAll('.tab-btn')
+            .forEach(btn => btn.classList.remove(
+                'text-blue-600', 'border-blue-600', 'border-b-2'
+            ));
+
+        document.getElementById(tabId)
+            .classList.remove('hidden');
+
+        document.querySelector(`[onclick="openTab('${tabId}')"]`)
+            .classList.add('text-blue-600', 'border-blue-600', 'border-b-2');
+    }
+
+    function serviceSelect() {
+        return {
+
+            // Load from Django
+            services: [
+                {% for s in services %}
+        "{{s.name}}",
+            {% endfor %}
+        ],
+
+    selected: [
+        {% if company_services %}
+    {% for s in company_services %}
+    "{{s.name}}",
+        {% endfor %}
+    {% endif %}
+        ],
+
+    search: "",
+        filtered: [],
+
+            filter() {
+        if (this.search.length < 1) {
+            this.filtered = [];
+            return;
+        }
+
+        this.filtered = this.services.filter(s =>
+            s.toLowerCase().includes(this.search.toLowerCase())
+            && !this.selected.includes(s)
+        );
+    },
+
+    add(service){
+        this.selected.push(service);
+        this.search = "";
+        this.filtered = [];
+    },
+
+    remove(index){
+        this.selected.splice(index, 1);
+    },
+
+    createService(){
+        if (!this.search.trim()) return;
+
+        if (!this.selected.includes(this.search)) {
+            this.selected.push(this.search);
+        }
+
+        this.search = "";
+        this.filtered = [];
+    }
+    }
+}
+
 </script>
 
 {% endblock %}
