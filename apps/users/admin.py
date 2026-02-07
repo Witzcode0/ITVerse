@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.users.models import User, Service, Company, socialLinks
+from apps.users.models import User, Service, Company, socialLinks, Connection
 # Register your models here.
 
 
@@ -11,3 +11,4 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Service)
 admin.site.register(Company)
 admin.site.register(socialLinks)
+admin.site.register(Connection)

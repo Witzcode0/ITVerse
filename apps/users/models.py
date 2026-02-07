@@ -177,3 +177,21 @@ class socialLinks(BaseClass):
     url = models.URLField()
     
 
+class Connection(BaseClass):
+    sender = models.ForeignKey(
+        User,
+        related_name="sent_requests",
+        on_delete=models.CASCADE
+    )
+    receiver = models.ForeignKey(
+        User,
+        related_name="received_requests",
+        on_delete=models.CASCADE
+    )
+    is_accepted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("sender", "receiver")
+
+    def __str__(self):
+        return f"{self.sender.id} -> {self.receiver.id}"

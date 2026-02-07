@@ -1,12 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from apps.users.models import User, Company, socialLinks, Service
+from django.db.models import Q
+
 from apps.master.utils.inputValidator import *
-# Create your views here.
+from apps.users.models import User, Company, socialLinks, Service
+from apps.users.services import (send_connection_request, accept_connection, get_connected_users, total_connections, pending_connection_request)
+
+
 
 def login_required(view_func):
     def wrapper(request, *args, **kwargs):
@@ -182,18 +186,22 @@ def profile(request):
     company = Company.objects.filter(contact_person=user_id_).first()
 
     # All services for dropdown
-    services = Service.objects.filter(is_approved=True, created_by_company=company)
-    print(company.services.filter(is_approved=True))
+    services = Service.objects.filter(is_approved=True)
+    if get_user.user_type == "seller":
+        company_services_ = company.services.filter(is_approved=True)
+    else:
+        company_services_ = None
 
     # print(services)
     # Social links
     social_links = socialLinks.objects.filter(user=user_id_)
-
     context = {
         "user": get_user,
         "company": company,
+        "company_services_":company_services_,
         "services": services,
         "social_links": social_links,
+        "total_connections": total_connections(get_user)
     }
 
     return render(request, "dashboard/profile.html", context)
@@ -223,10 +231,23 @@ def update_profile(request):
 
         messages.success(request, "Profile updated successfully.")
         return redirect("profile")
+
 def logout(request):
     del request.session["user_id"]
     messages.success(request, "Now, you are logged Out.")
     return redirect("login")
+
+@login_required
+def remove_service(request, service_id):
+    user_id_ = request.session["user_id"]
+
+    company = get_object_or_404(Company, contact_person=user_id_)
+    service = get_object_or_404(Service, id=service_id)
+
+    # Remove service from company
+    company.services.remove(service)
+
+    return redirect("profile")
 
 @login_required
 def add_company(request):
@@ -252,6 +273,9 @@ def add_company(request):
         """
 
         service_names = request.POST.getlist("services[]")
+
+        if service_names:
+            print(service_names)
 
         service_objects = []
 
@@ -294,22 +318,76 @@ def add_company(request):
 @login_required
 def add_social_link(request):
     user_id_ = request.session["user_id"]
+    get_user = User.objects.get(id=user_id_)
     if request.method == "POST":
 
         name = request.POST.get("name")
         url = request.POST.get("url")
 
-        socialLinks.objects.create(
-            user=user_id_,
+        new_link = socialLinks.objects.create(
+            user=get_user,
             name=name,
             url=url
         )
+        new_link.save()
 
         messages.success(request, "Social link added ✅")
 
         return redirect("profile")
 
     return redirect("profile")
+
+@login_required
+def connections_view(request):
+    user_id_ = request.session["user_id"]
+    get_user = User.objects.get(id=user_id_)
+    connected_users = get_connected_users(get_user)
+
+    context = {
+        "connected_users": connected_users,
+        "total_connections": total_connections(get_user),
+        "pending_connection_request":pending_connection_request(user_id_)
+    }
+    return render(request, "dashboard/connections.html", context)
+
+@login_required
+def send_request_view(request, receiver_id):
+    user_id_ = request.session["user_id"]
+    get_user = User.objects.get(id=user_id_)
+    receiver = get_object_or_404(User, id=receiver_id)
+    send_connection_request(get_user, receiver)
+    return redirect("connections")
+
+@login_required
+def accept_request_view(request, sender_id):
+    print(sender_id)
+    user_id_ = request.session["user_id"]
+    get_user = User.objects.get(id=user_id_)
+    print(get_user)
+    sender = get_object_or_404(User, id=sender_id)
+    print(sender)
+    accept_connection(sender, get_user)
+    return redirect("connections")
+
+def search_connections(request):
+    query = request.GET.get('q', '').strip()
+    current_user_id = request.session.get("user_id")  # based on your previous code
+
+    users = []
+
+    if query:
+        users = User.objects.filter(
+            Q(fullname__icontains=query) |
+            Q(email__icontains=query)
+        ).exclude(id=current_user_id)[:20]   # limit results for performance
+
+    context = {
+        "users": users,
+        "query": query,
+        
+    }
+
+    return render(request, "dashboard/search_connection.html", context)
 
 def index(request):
     return render(request, "dashboard/index.html")

@@ -1,0 +1,115 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}
+Search Connections
+{% endblock %}
+
+{% block body %}
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- Header -->
+    <div class="bg-white/70 backdrop-blur-lg border border-gray-200 rounded-3xl p-8 shadow-sm mb-10">
+        <h2 class="text-4xl font-bold text-gray-800">
+            🔍 Find People
+        </h2>
+        <p class="text-gray-500 mt-2 text-lg">
+            Expand your professional network by connecting with amazing people.
+        </p>
+    </div>
+
+
+
+    <!-- Search -->
+    <form method="GET" class="mb-12">
+        <div class="relative">
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Search professionals by name or email..."
+                value="{{ request.GET.q }}"
+                class="w-full px-6 py-4 pl-14 text-lg rounded-2xl border border-gray-200 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 shadow-sm transition"
+            >
+
+            <!-- Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="w-6 h-6 absolute left-5 top-4.5 text-gray-400"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-4.3-4.3m1.8-5.2a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+
+        </div>
+    </form>
+
+
+
+    {% if users %}
+
+    <!-- Grid -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+        {% for user in users %}
+        <div class="group bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition duration-300">
+
+            <!-- Avatar + Info -->
+            <div class="flex flex-col items-center text-center">
+
+                <div class="w-20 h-20 rounded-full bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-400 flex items-center justify-center text-white text-2xl font-bold shadow-md group-hover:scale-110 transition">
+                    {{ user.fullname|slice:":1" }}
+                </div>
+
+                <h3 class="mt-4 text-xl font-semibold text-gray-800">
+                    {{ user.fullname }}
+                </h3>
+
+                {% if user.email %}
+                <p class="text-gray-500 text-sm mt-1">
+                    {{ user.email }}
+                </p>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Connect Button -->
+            <a href="{% url 'send_request_view' user.id %}"
+               class="block text-center mt-6 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition">
+                Connect
+            </a>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="bg-white border border-gray-100 rounded-3xl py-20 flex flex-col items-center shadow-sm">
+
+        <div class="text-7xl mb-6">
+            🔎
+        </div>
+
+        <h3 class="text-2xl font-bold text-gray-700">
+            No Users Found
+        </h3>
+
+        <p class="text-gray-500 mt-3 text-lg">
+            Try searching with another name or email.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

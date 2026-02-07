@@ -1,0 +1,182 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}
+Connections
+{% endblock %}
+
+{% block body %}
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- TOP STATS -->
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+
+        <!-- Total Connections -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-3xl shadow-lg">
+            <h3 class="text-lg opacity-90">Total Connections</h3>
+            <p class="text-4xl font-bold mt-2">{{ total_connections }}</p>
+        </div>
+
+        <!-- Pending Requests -->
+        <div class="bg-white border border-gray-200 p-6 rounded-3xl shadow-sm">
+            <h3 class="text-lg text-gray-500">Pending Requests</h3>
+            <p class="text-4xl font-bold text-gray-800 mt-2">
+                {{ pending_connection_request|length }}
+            </p>
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= PENDING REQUESTS ================= -->
+
+    {% if pending_connection_request %}
+    <div class="mb-12">
+
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">
+                Pending Requests
+            </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {% for request in pending_connection_request %}
+            <div class="bg-white border border-yellow-100 rounded-3xl p-6 shadow-sm hover:shadow-xl transition">
+
+                <div class="flex items-center gap-4">
+
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center text-white font-bold text-lg">
+                        {{ request.sender.fullname|slice:":1" }}
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-800 text-lg">
+                            {{ request.sender.fullname }}
+                        </h3>
+
+                        <p class="text-sm text-yellow-600 font-medium">
+                            Wants to connect
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="flex gap-3 mt-5">
+
+                    <a href="{% url 'accept-request' request.sender.id %}"
+                       class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-semibold transition">
+                        Approve
+                    </a>
+
+                    <a href=""
+                       class="flex-1 text-center border border-gray-300 hover:bg-gray-100 py-2 rounded-xl font-semibold transition">
+                        Reject
+                    </a>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+    {% endif %}
+
+
+
+    <!-- ================= APPROVED CONNECTIONS ================= -->
+
+    <div>
+
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">
+                Your Connections
+            </h2>
+
+            <a href="{% url 'search_connections' %}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl shadow transition">
+                + Add Connection
+            </a>
+        </div>
+
+
+        {% if connected_users %}
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+            {% for user in connected_users %}
+            <div class="group bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition">
+
+                <div class="flex flex-col items-center text-center">
+
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold group-hover:scale-110 transition">
+                        {{ user.fullname|slice:":1" }}
+                    </div>
+
+                    <h3 class="mt-4 text-lg font-semibold text-gray-800">
+                        {{ user.fullname }}
+                    </h3>
+
+                    {% if user.email %}
+                    <p class="text-gray-500 text-sm">
+                        {{ user.email }}
+                    </p>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="flex gap-2 mt-6">
+
+                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl font-medium transition">
+                        View
+                    </button>
+
+                    <button class="flex-1 border border-gray-300 hover:bg-gray-100 py-2 rounded-xl font-medium transition">
+                        Message
+                    </button>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- Empty -->
+        <div class="bg-white border border-gray-100 rounded-3xl py-20 flex flex-col items-center shadow-sm">
+
+            <div class="text-7xl mb-6">
+                🤝
+            </div>
+
+            <h3 class="text-2xl font-bold text-gray-700">
+                No Connections Yet
+            </h3>
+
+            <p class="text-gray-500 mt-3 text-lg">
+                Start building your professional network.
+            </p>
+
+            <a href="{% url 'search_connections' %}"
+               class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow transition">
+                Find People
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
