@@ -1,5 +1,6 @@
 from django.urls import path
 from apps.dashboard.views import *
+from apps.dashboard.api import *
 
 urlpatterns = [
     path('', index, name='index'),
@@ -19,5 +20,5 @@ urlpatterns = [
     path('logout/', logout, name='logout'),
     path('blog/', blog, name='blog'),
     path('about/', about, name='about'),
-    path('contact/', contact, name='contact')
+    path('contact/', contact, name='contact'),
 ]

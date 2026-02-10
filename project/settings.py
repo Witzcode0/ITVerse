@@ -49,7 +49,7 @@ INSTALLED_APPS += [
 
 # THIRDPARTY_APPS
 INSTALLED_APPS += [
-    
+    'rest_framework'
 ]
 
 
