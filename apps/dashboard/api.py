@@ -27,19 +27,27 @@ from apps.dashboard.serializers import contactSerializers
 
 @api_view(["POST", "GET"])
 def contactListAPI(request):
-    print("test-1")
+
+    if request.method == "GET":
+        querySet = Contact.objects.all()
+        serializer = contactSerializers(querySet, many=True)
+        context = {
+            "message": "All data retive successfully",
+            "status_code": status.HTTP_200_OK,
+            "data": serializer.data
+        }
+        return Response(context, status=status.HTTP_200_OK)
+    
     if request.method == "POST":
-        print("test-5")
+        print(request.data['email'], "-----")
         serializer = contactSerializers(data=request.data)
         if serializer.is_valid():
-            print("test-6")
             serializer.save()
             context = {
                 "message": "Data created successfully.",
                 "status_code": status.HTTP_201_CREATED,
                 "data": serializer.data
             }
-            print("test-7", context)
             return Response(context, status=status.HTTP_201_CREATED)
         else:
             context = {
@@ -48,30 +56,52 @@ def contactListAPI(request):
             }
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == "GET":
-        print("test-2")
-        querySet = Contact.objects.all()
-        serializer = contactSerializers(querySet, many=True)
-        print("test-3")
-        context = {
-            "message": "All data retive successfully",
-            "status_code": status.HTTP_200_OK,
-            "data": serializer.data
-        }
-        print("test-4", context)
-        return Response(context, status=status.HTTP_200_OK,)
-
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
 def contactDetailAPI(request, contact_id):
 
+    try:
+        querySet = Contact.objects.get(id=contact_id)
+    except Contact.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     if request.method == "GET":
-        pass
+        serializer = contactSerializers(querySet)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     if request.method == "PUT":
-        pass
+        serializer = contactSerializers(querySet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            context = {
+                "message": "Data updated successfully.",
+                "status_code": status.HTTP_200_OK,
+                "data": serializer.data
+            }
+            return Response(context, status=status.HTTP_200_OK)
+        else:
+            context = {
+                "status_code": status.HTTP_400_BAD_REQUEST,
+                "errors": serializer.errors
+            }
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == "PATCH":
-        pass
+        serializer = contactSerializers(querySet, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            context = {
+                "message": "Data updated successfully.",
+                "status_code": status.HTTP_200_OK,
+                "data": serializer.data
+            }
+            return Response(context, status=status.HTTP_200_OK)
+        else:
+            context = {
+                "status_code": status.HTTP_400_BAD_REQUEST,
+                "errors": serializer.errors
+            }
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == "DELETE":
-        pass
+        querySet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

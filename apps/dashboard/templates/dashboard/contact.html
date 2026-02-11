@@ -6,67 +6,154 @@ Contact
 {% block body %}
 <section class="text-gray-600 body-font relative">
     <div class="container px-5 py-24 mx-auto flex sm:flex-nowrap flex-wrap">
+
+        <!-- LEFT SIDE MAP -->
         <div
             class="lg:w-2/3 md:w-1/2 bg-gray-300 rounded-lg overflow-hidden sm:mr-10 p-10 flex items-end justify-start relative">
-            <iframe width="100%" height="100%" class="absolute inset-0" frameborder="0" title="map" marginheight="0"
-                marginwidth="0" scrolling="no"
-                src="https://maps.google.com/maps?width=100%&height=600&hl=en&q=%C4%B0zmir+(My%20Business%20Name)&ie=UTF8&t=&z=14&iwloc=B&output=embed"
-                style="filter: grayscale(1) contrast(1.2) opacity(0.4);"></iframe>
+
+            <iframe width="100%" height="100%" class="absolute inset-0"
+                frameborder="0"
+                src="https://maps.google.com/maps?width=100%&height=600&hl=en&q=Rajkot+(Bharat%20Futuriis%20AI)&output=embed"
+                style="filter: grayscale(1) contrast(1.2) opacity(0.4);">
+            </iframe>
+
             <div class="bg-white relative flex flex-wrap py-6 rounded shadow-md">
                 <div class="lg:w-1/2 px-6">
-                    <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">ADDRESS</h2>
-                    <p class="mt-1">Photo booth tattooed prism, portland taiyaki hoodie neutra typewriter</p>
+                    <h2 class="font-semibold text-xs">ADDRESS</h2>
+                    <p class="mt-1">Rajkot, Gujarat, India</p>
                 </div>
                 <div class="lg:w-1/2 px-6 mt-4 lg:mt-0">
-                    <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs">EMAIL</h2>
-                    <a class="text-blue-500 leading-relaxed">example@email.com</a>
-                    <h2 class="title-font font-semibold text-gray-900 tracking-widest text-xs mt-4">PHONE</h2>
-                    <p class="leading-relaxed">123-456-7890</p>
+                    <h2 class="font-semibold text-xs">EMAIL</h2>
+                    <p class="text-blue-500">brijesh.gondaliya07@gmail.com</p>
+                    <h2 class="font-semibold text-xs mt-4">PHONE</h2>
+                    <p>+91 8980145007</p>
                 </div>
             </div>
         </div>
-        <div class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
-            <h2 class="text-gray-900 text-lg mb-2 font-medium title-font">
+
+        <!-- RIGHT SIDE FORM -->
+        <form id="contactForm"
+              method="POST"
+              action="javascript:void(0);"
+              class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
+
+            {% csrf_token %}
+
+            <h2 class="text-gray-900 text-lg mb-4 font-medium">
                 Contact Us
             </h2>
 
-            <p class="leading-relaxed mb-5 text-gray-600">
-                Have a question or need help? Fill out the form below and we’ll get back to you shortly.
-            </p>
-
-            <div class="relative mb-4">
-                <label for="name" class="leading-7 text-sm text-gray-600">
-                    Name
-                </label>
-                <input type="text" id="name" name="name" placeholder="Your full name"
-                    class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out">
+            <!-- ALERT BOX -->
+            <div id="alertBox"
+                 class="hidden border-l-4 p-4 mb-4 rounded shadow-md"
+                 role="alert">
+                <p class="font-semibold" id="responseMessage"></p>
             </div>
 
             <div class="relative mb-4">
-                <label for="email" class="leading-7 text-sm text-gray-600">
-                    Email
-                </label>
-                <input type="email" id="email" name="email" placeholder="you@example.com"
-                    class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                <label class="text-sm text-gray-600">Name</label>
+                <input type="text" id="name" name="name"
+                       required
+                       class="w-full rounded border border-gray-300 py-2 px-3 focus:ring-2 focus:ring-blue-300">
             </div>
 
             <div class="relative mb-4">
-                <label for="message" class="leading-7 text-sm text-gray-600">
-                    Message
-                </label>
-                <textarea id="message" name="message" placeholder="Write your message here..."
-                    class="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 h-32 text-base outline-none text-gray-700 py-2 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+                <label class="text-sm text-gray-600">Email</label>
+                <input type="email" id="email" name="email"
+                       required
+                       class="w-full rounded border border-gray-300 py-2 px-3 focus:ring-2 focus:ring-blue-300">
+            </div>
+
+            <div class="relative mb-4">
+                <label class="text-sm text-gray-600">Mobile</label>
+                <input type="text" id="mobile" name="mobile"
+                       required
+                       class="w-full rounded border border-gray-300 py-2 px-3 focus:ring-2 focus:ring-blue-300">
+            </div>
+
+            <div class="relative mb-4">
+                <label class="text-sm text-gray-600">Message</label>
+                <textarea id="content" name="content"
+                          required
+                          class="w-full rounded border border-gray-300 h-32 py-2 px-3 focus:ring-2 focus:ring-blue-300"></textarea>
             </div>
 
             <button type="submit"
-                class="text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded text-lg w-full">
-                Send Message
+                    id="submitBtn"
+                    class="text-white bg-blue-500 py-2 px-6 hover:bg-blue-600 rounded text-lg w-full flex justify-center items-center">
+                <span id="btnText">Send Message</span>
             </button>
 
             <p class="text-xs text-gray-500 mt-3 text-center">
                 We usually respond within 24 hours.
             </p>
-        </div>
+
+        </form>
     </div>
 </section>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+
+    $("#contactForm").submit(function (e) {
+        e.preventDefault();
+
+        let name = $("#name").val();
+        let email = $("#email").val();
+        let mobile = $("#mobile").val();
+        let content = $("#content").val();
+
+        // Button loading state
+        $("#submitBtn").prop("disabled", true);
+        $("#btnText").text("Sending...");
+
+        $.ajax({
+            url: "/api/contacts/",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                name: name,
+                email: email,
+                mobile: mobile,
+                content: content
+            }),
+            headers: {
+                "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function (response) {
+
+                $("#alertBox")
+                    .removeClass("hidden bg-red-100 border-red-500 text-red-700")
+                    .addClass("bg-green-100 border-green-500 text-green-700");
+
+                $("#responseMessage").text("Message sent successfully!");
+
+                $("#contactForm")[0].reset();
+            },
+            error: function (xhr) {
+
+                $("#alertBox")
+                    .removeClass("hidden bg-green-100 border-green-500 text-green-700")
+                    .addClass("bg-red-100 border-red-500 text-red-700");
+
+                $("#responseMessage").text("Something went wrong! Please try again.");
+            },
+            complete: function () {
+                $("#submitBtn").prop("disabled", false);
+                $("#btnText").text("Send Message");
+
+                // Auto hide after 3 seconds
+                setTimeout(function () {
+                    $("#alertBox").addClass("hidden");
+                }, 3000);
+            }
+        });
+    });
+
+});
+</script>
+
 {% endblock %}
