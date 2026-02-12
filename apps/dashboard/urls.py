@@ -19,6 +19,7 @@ urlpatterns = [
     path("search_connections/", search_connections, name='search_connections'),
     path('logout/', logout, name='logout'),
     path('blog/', blog, name='blog'),
+    path("blog-detail/<uuid:blog_id>", blog_detail, name="blog_detail"),
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
 ]

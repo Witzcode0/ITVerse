@@ -194,4 +194,4 @@ class Connection(BaseClass):
         unique_together = ("sender", "receiver")
 
     def __str__(self):
-        return f"{self.sender.id} -> {self.receiver.id}"
+        return f"{self.sender.fullname} -> {self.receiver.fullname}"

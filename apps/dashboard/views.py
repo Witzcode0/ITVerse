@@ -8,6 +8,7 @@ from django.db.models import Q
 
 from apps.master.utils.inputValidator import *
 from apps.users.models import User, Company, socialLinks, Service
+from apps.dashboard.models import Blog
 from apps.users.services import (send_connection_request, accept_connection, get_connected_users, total_connections, pending_connection_request)
 
 
@@ -232,6 +233,7 @@ def update_profile(request):
         messages.success(request, "Profile updated successfully.")
         return redirect("profile")
 
+@login_required
 def logout(request):
     del request.session["user_id"]
     messages.success(request, "Now, you are logged Out.")
@@ -369,6 +371,7 @@ def accept_request_view(request, sender_id):
     accept_connection(sender, get_user)
     return redirect("connections")
 
+@login_required
 def search_connections(request):
     query = request.GET.get('q', '').strip()
     current_user_id = request.session.get("user_id")  # based on your previous code
@@ -393,7 +396,19 @@ def index(request):
     return render(request, "dashboard/index.html")
 
 def blog(request):
-    return render(request, "dashboard/blog.html")
+    blogs = Blog.objects.all()
+    context = {
+        "blogs":blogs
+    }
+    return render(request, "dashboard/blog.html", context)
+
+def blog_detail(request, blog_id):
+    blog = Blog.objects.get(id=blog_id)
+    context = {
+        "blog":blog
+    }
+    print(context)
+    return render(request, "dashboard/blog_detail.html", context)
 
 def about(request):
     return render(request, "dashboard/about.html")
