@@ -8,8 +8,9 @@ from django.db.models import Q
 
 from apps.master.utils.inputValidator import *
 from apps.users.models import User, Company, socialLinks, Service
-from apps.dashboard.models import Blog
+from apps.dashboard.models import Blog,Task
 from apps.users.services import (send_connection_request, accept_connection, get_connected_users, total_connections, pending_connection_request)
+from apps.dashboard.forms import TaskForm
 
 
 
@@ -394,6 +395,28 @@ def search_connections(request):
 
 def index(request):
     return render(request, "dashboard/index.html")
+
+def crud(request):
+    form = TaskForm()
+    tasks = Task.objects.all().order_by("-created_at")
+    if request.method == "POST":
+        title_ = request.POST['title']
+        content_ = request.POST['content']
+        Task.objects.create(
+            title = title_,
+            content = content_
+        )
+    context = {
+        "form": form,
+        "tasks":tasks
+    }
+    return render(request, "dashboard/crud.html", context)
+
+def crud_record_delete(request, record_id):
+    delete_task = Task.objects.get(id=record_id)
+    delete_task.delete()
+    messages.success(request, "Recorde deleted successfully.")
+    return redirect("crud")
 
 def blog(request):
     blogs = Blog.objects.all()

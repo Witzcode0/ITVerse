@@ -4,6 +4,8 @@ from apps.dashboard.api import *
 
 urlpatterns = [
     path('', index, name='index'),
+    path("crud", crud, name="crud"),
+    path("crud-record-delete/<uuid:record_id>", crud_record_delete, name="crud_record_delete"),
     path('login/', login, name='login'),
     path('register/', register, name='register'),
     path('forgot-password/', forgot_password, name='forgot_password'),

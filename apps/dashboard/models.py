@@ -24,3 +24,8 @@ class Blog(BaseClass):
 
     def __str__(self):
         return self.title
+    
+class Task(BaseClass):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    

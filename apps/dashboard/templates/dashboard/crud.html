@@ -1,0 +1,78 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}
+CRUD
+{% endblock %}
+
+{% block body %}
+
+<div class="grid grid-cols-12 gap-6">
+
+    <!-- LEFT (4 columns) -->
+    <div class="col-span-4 border bg-gray-200 p-6">
+        <form action="{% url 'crud' %}" method="post">
+            {% csrf_token %}
+            {{form}}
+            <button type="submit"
+                class="lg:mt-2 xl:mt-0 flex-shrink-0 inline-flex text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded">Save</button>
+        </form>
+    </div>
+
+    <!-- RIGHT (8 columns) -->
+    <div class="col-span-8 border bg-white p-6 rounded-xl shadow-sm">
+
+        <h2 class="text-xl font-semibold mb-4">Tasks</h2>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+
+                <!-- Table Head -->
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="text-left py-3 px-4 border-b">ID</th>
+                        <th class="text-left py-3 px-4 border-b">Title</th>
+                        <th class="text-left py-3 px-4 border-b">Content</th>
+                        <th class="text-left py-3 px-4 border-b">Actions</th>
+                    </tr>
+                </thead>
+
+                <!-- Table Body -->
+                <tbody class="bg-white">
+
+                    {% for task in tasks %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="py-3 px-4 border-b">{{ task.id }}</td>
+                        <td class="py-3 px-4 border-b">{{ task.title }}</td>
+                        <td class="py-3 px-4 border-b">{{ task.content }}</td>
+
+                        <td class="py-3 px-4 border-b space-x-2">
+
+                            <!-- Edit -->
+                            <a href=""
+                                class="bg-yellow-400 hover:bg-yellow-500 text-white py-1 px-3 rounded text-sm">
+                                Edit
+                            </a>
+
+                            <!-- Delete -->
+                            <a href="{% url 'crud_record_delete' record_id=task.id %}"
+                                class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm">
+                                Delete
+                            </a>
+
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-6 text-gray-500">
+                            No records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
